@@ -1,13 +1,15 @@
 package com.bootcamp.webflux.proyect1_customers;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -15,16 +17,17 @@ import com.bootcamp.webflux.proyect1_customers.models.documents.Customers;
 import com.bootcamp.webflux.proyect1_customers.models.documents.TypeCustomer;
 import com.bootcamp.webflux.proyect1_customers.models.documents.TypeDocument;
 import com.bootcamp.webflux.proyect1_customers.models.services.CustomersService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import reactor.core.publisher.Mono;
 //para el mock
-//@AutoConfigureWebTestClient
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class Proyect1CustomersApplicationTests {
 
 	@Autowired
 	private WebTestClient client;
-		
+	
 	@Autowired
 	private CustomersService service;
 		
@@ -33,7 +36,7 @@ class Proyect1CustomersApplicationTests {
 	void listTest() {
 		
 		client.get()
-		.uri("api/customers")
+		.uri("/api/customers")
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.exchange()
 		.expectStatus().isOk()
@@ -56,7 +59,7 @@ class Proyect1CustomersApplicationTests {
 		Customers customers = service.findByName("Laive").block();
 		
 		client.get()
-		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("/api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.exchange()
 		.expectStatus().isOk()
@@ -83,16 +86,18 @@ class Proyect1CustomersApplicationTests {
 		
 		Customers customers = new Customers("Luis Felipe", typeCustomer, typeDocument, "09805072");
 		client.post()
-		.uri("api/customers")
+		.uri("/api/customers")
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.contentType(MediaType.APPLICATION_JSON_UTF8)
 		.body(Mono.just(customers), Customers.class)
 		.exchange()
 		.expectStatus().isCreated()
 		.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-		.expectBody(Customers.class)
+		.expectBody(new ParameterizedTypeReference<LinkedHashMap<String, Object>>() {
+		})
 		.consumeWith(response -> {
-			Customers c = response.getResponseBody();
+			Object o = response.getResponseBody().get("customers");
+			Customers c = new ObjectMapper().convertValue(o, Customers.class);
 			Assertions.assertThat(c.getId()).isNotEmpty();
 			Assertions.assertThat(c.getTypeCustomer().getName()).isEqualTo("Personal");
 			Assertions.assertThat(c.getTypeDocument().getName()).isEqualTo("DNI");
@@ -100,11 +105,11 @@ class Proyect1CustomersApplicationTests {
 			Assertions.assertThat(c.getNumbDocument()).isNotEmpty();
 		});
 		/*.expectBody()
-		.jsonPath("$.id").isNotEmpty()
-		.jsonPath("$.name").isEqualTo("Luis Felipe")
-		.jsonPath("$.typeCustomer.name").isEqualTo("Personal")
-		.jsonPath("$.typeDocument.name").isEqualTo("DNI")
-		.jsonPath("$.numbDocument").isEqualTo("09805072")
+		.jsonPath("$.customers.id").isNotEmpty()
+		.jsonPath("$.customers.name").isEqualTo("Luis Felipe")
+		.jsonPath("$.customers.typeCustomer.name").isEqualTo("Personal")
+		.jsonPath("$.customers.typeDocument.name").isEqualTo("DNI")
+		.jsonPath("$.customers.numbDocument").isEqualTo("09805072")
 		.jsonPath("$.numbDocument").isNotEmpty();*/
 	}
 
@@ -118,7 +123,7 @@ class Proyect1CustomersApplicationTests {
 		
 		Customers customersEdit = new Customers("A y N", typeCustomer, typeDocument, "20509805072");
 		client.put()
-		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("/api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.contentType(MediaType.APPLICATION_JSON_UTF8)
 		.body(Mono.just(customersEdit), Customers.class)
@@ -148,7 +153,7 @@ class Proyect1CustomersApplicationTests {
 		Customers customers = service.findByName("Gloria").block();
 		
 		client.delete()
-		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("/api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.exchange()
 		.expectStatus().isNoContent()
 		.expectBody()
