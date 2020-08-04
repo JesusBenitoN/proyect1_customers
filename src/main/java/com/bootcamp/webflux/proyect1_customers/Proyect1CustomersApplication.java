@@ -31,6 +31,7 @@ public class Proyect1CustomersApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Proyect1CustomersApplication.class, args);
+		
 	}
 
 	@Override

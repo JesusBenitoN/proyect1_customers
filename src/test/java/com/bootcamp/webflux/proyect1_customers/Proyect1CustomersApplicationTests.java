@@ -33,7 +33,7 @@ class Proyect1CustomersApplicationTests {
 	void listTest() {
 		
 		client.get()
-		.uri("api/v2/customers")
+		.uri("api/customers")
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.exchange()
 		.expectStatus().isOk()
@@ -56,7 +56,7 @@ class Proyect1CustomersApplicationTests {
 		Customers customers = service.findByName("Laive").block();
 		
 		client.get()
-		.uri("api/v2/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.exchange()
 		.expectStatus().isOk()
@@ -83,7 +83,7 @@ class Proyect1CustomersApplicationTests {
 		
 		Customers customers = new Customers("Luis Felipe", typeCustomer, typeDocument, "09805072");
 		client.post()
-		.uri("api/v2/customers")
+		.uri("api/customers")
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.contentType(MediaType.APPLICATION_JSON_UTF8)
 		.body(Mono.just(customers), Customers.class)
@@ -118,7 +118,7 @@ class Proyect1CustomersApplicationTests {
 		
 		Customers customersEdit = new Customers("A y N", typeCustomer, typeDocument, "20509805072");
 		client.put()
-		.uri("api/v2/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.accept(MediaType.APPLICATION_JSON_UTF8)
 		.contentType(MediaType.APPLICATION_JSON_UTF8)
 		.body(Mono.just(customersEdit), Customers.class)
@@ -148,7 +148,7 @@ class Proyect1CustomersApplicationTests {
 		Customers customers = service.findByName("Gloria").block();
 		
 		client.delete()
-		.uri("api/v2/customers/{id}", Collections.singletonMap("id", customers.getId()))
+		.uri("api/customers/{id}", Collections.singletonMap("id", customers.getId()))
 		.exchange()
 		.expectStatus().isNoContent()
 		.expectBody()
