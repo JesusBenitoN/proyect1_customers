@@ -33,25 +33,25 @@ public class CustomersRestController {
 	@Autowired
 	private CustomersService service;
 
-	@SuppressWarnings("deprecation")
+	
 	@GetMapping
 	public Mono<ResponseEntity<Flux<Customers>>> list(){
 		return Mono.just(
 				ResponseEntity.ok()
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.contentType(MediaType.APPLICATION_JSON)
 				.body(service.findAllCustomer())
 				);
 	}
 	
-	@SuppressWarnings("deprecation")
+	
 	@GetMapping("/{id}")
 	public Mono<ResponseEntity<Customers>> seeDetail(@PathVariable String id){
-		return service.findCustomerById(id).map(c -> ResponseEntity.ok()
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.body(c)).defaultIfEmpty(ResponseEntity.notFound().build());
+		return service.findCustomerById(id).map(c -> ResponseEntity.ok(c)
+				/*.contentType(MediaType.APPLICATION_JSON)
+				.body(c)*/).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 	
-	@SuppressWarnings("deprecation")
+	
 	@PostMapping
 	public Mono<ResponseEntity<Map<String, Object>>> create (@Valid @RequestBody Mono<Customers> monoCustomers){
 		
@@ -62,7 +62,7 @@ public class CustomersRestController {
 				respuesta.put("customers", c);
 				return ResponseEntity
 					.created(URI.create("/api/customers/" .concat(c.getId())))
-					.contentType(MediaType.APPLICATION_JSON_UTF8)
+					.contentType(MediaType.APPLICATION_JSON)
 					.body(respuesta);
 			});
 			
@@ -79,7 +79,7 @@ public class CustomersRestController {
 		});
 	}
 	
-	@SuppressWarnings("deprecation")
+	
 	@PutMapping("/{id}")
 	public Mono<ResponseEntity<Customers>> edit (@RequestBody Customers customers, @PathVariable String id){
 		return service.findCustomerById(id).flatMap(c -> {
@@ -90,7 +90,7 @@ public class CustomersRestController {
 			return service.save(c);
 			}).map( c -> 
 				ResponseEntity.created(URI.create("api/customers/".concat(c.getId())))
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.contentType(MediaType.APPLICATION_JSON)
 				.body(c)).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 	

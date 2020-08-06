@@ -31,16 +31,16 @@ class Proyect1CustomersApplicationTests {
 	@Autowired
 	private CustomersService service;
 		
-	@SuppressWarnings("deprecation")
+	
 	@Test
 	void listTest() {
 		
 		client.get()
 		.uri("/api/customers")
-		.accept(MediaType.APPLICATION_JSON_UTF8)
+		.accept(MediaType.APPLICATION_JSON)
 		.exchange()
 		.expectStatus().isOk()
-		.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+		.expectHeader().contentType(MediaType.APPLICATION_JSON)
 		.expectBodyList(Customers.class)
 		.consumeWith(response -> {
 			List<Customers> customers = response.getResponseBody();
@@ -52,7 +52,7 @@ class Proyect1CustomersApplicationTests {
 //		.hasSize(2);
 	}
 	
-	@SuppressWarnings("deprecation")
+	
 	@Test
 	void seeTest() {
 		
@@ -60,10 +60,10 @@ class Proyect1CustomersApplicationTests {
 		
 		client.get()
 		.uri("/api/customers/{id}", Collections.singletonMap("id", customers.getId()))
-		.accept(MediaType.APPLICATION_JSON_UTF8)
+		.accept(MediaType.APPLICATION_JSON)
 		.exchange()
 		.expectStatus().isOk()
-		.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+		.expectHeader().contentType(MediaType.APPLICATION_JSON)
 		//cuando el body es un objeto
 		.expectBody(Customers.class)
 		.consumeWith(response -> {
@@ -77,7 +77,7 @@ class Proyect1CustomersApplicationTests {
 		.jsonPath("$.name").isEqualTo("Gloria");*/
 	}
 	
-	@SuppressWarnings("deprecation")
+	
 	@Test
 	void createTest() {
 		
@@ -87,12 +87,12 @@ class Proyect1CustomersApplicationTests {
 		Customers customers = new Customers("Luis Felipe", typeCustomer, typeDocument, "09805072");
 		client.post()
 		.uri("/api/customers")
-		.accept(MediaType.APPLICATION_JSON_UTF8)
-		.contentType(MediaType.APPLICATION_JSON_UTF8)
+		.accept(MediaType.APPLICATION_JSON)
+		.contentType(MediaType.APPLICATION_JSON)
 		.body(Mono.just(customers), Customers.class)
 		.exchange()
 		.expectStatus().isCreated()
-		.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+		.expectHeader().contentType(MediaType.APPLICATION_JSON)
 		.expectBody(new ParameterizedTypeReference<LinkedHashMap<String, Object>>() {
 		})
 		.consumeWith(response -> {
@@ -113,7 +113,7 @@ class Proyect1CustomersApplicationTests {
 		.jsonPath("$.numbDocument").isNotEmpty();*/
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	@Test
 	void editTest() {
 		Customers customers = service.findByName("Jesus Benito").block();
@@ -124,12 +124,12 @@ class Proyect1CustomersApplicationTests {
 		Customers customersEdit = new Customers("A y N", typeCustomer, typeDocument, "20509805072");
 		client.put()
 		.uri("/api/customers/{id}", Collections.singletonMap("id", customers.getId()))
-		.accept(MediaType.APPLICATION_JSON_UTF8)
-		.contentType(MediaType.APPLICATION_JSON_UTF8)
+		.accept(MediaType.APPLICATION_JSON)
+		.contentType(MediaType.APPLICATION_JSON)
 		.body(Mono.just(customersEdit), Customers.class)
 		.exchange()
 		.expectStatus().isCreated()
-		.expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+		.expectHeader().contentType(MediaType.APPLICATION_JSON)
 		.expectBody(Customers.class)
 		.consumeWith(response -> {
 			Customers c = response.getResponseBody();
