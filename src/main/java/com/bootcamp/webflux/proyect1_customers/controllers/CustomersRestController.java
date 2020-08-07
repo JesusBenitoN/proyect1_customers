@@ -1,8 +1,6 @@
 package com.bootcamp.webflux.proyect1_customers.controllers;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.support.WebExchangeBindException;
 
 import com.bootcamp.webflux.proyect1_customers.models.documents.Customers;
 import com.bootcamp.webflux.proyect1_customers.models.services.CustomersService;
@@ -53,30 +50,15 @@ public class CustomersRestController {
 	
 	
 	@PostMapping
-	public Mono<ResponseEntity<Map<String, Object>>> create (@Valid @RequestBody Mono<Customers> monoCustomers){
+	public Mono<ResponseEntity<Customers>> create (@Valid @RequestBody Customers customers/*Mono<Customers> monoCustomers*/){
 		
-		Map<String, Object> respuesta = new HashMap<String, Object>();
-		return monoCustomers.flatMap(customers -> {
-			
 			return service.save(customers).map(c -> {
-				respuesta.put("customers", c);
 				return ResponseEntity
 					.created(URI.create("/api/customers/" .concat(c.getId())))
 					.contentType(MediaType.APPLICATION_JSON)
-					.body(respuesta);
+					.body(c);
 			});
-			
-		}).onErrorResume(t -> {
-			return Mono.just(t).cast(WebExchangeBindException.class)
-					.flatMap(e -> Mono.just(e.getFieldErrors()))
-					.flatMapMany(errors -> Flux.fromIterable(errors))
-					.map(fieldError -> "El campo "+ fieldError.getField()+ " "+ fieldError.getDefaultMessage())
-					.collectList()
-					.flatMap(list -> {
-						respuesta.put("error", list);
-						return Mono.just(ResponseEntity.badRequest().body(respuesta));
-					});
-		});
+
 	}
 	
 	
